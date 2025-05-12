@@ -374,6 +374,13 @@ footer hr {
 
 .footer-map-embed {
     min-height: 200px;
+    overflow: hidden;
+}
+
+.footer-map-embed iframe {
+    height: 200px;
+    width: 100%;
+    min-width: 200px;
 }
 
 .footer-contact-social-links {
@@ -494,10 +501,12 @@ footer hr {
     padding: 100px 0 0;
 } */
 
+/* call to action carousel */
+
 .landing-cta-container {
     width: 100%;
     position: absolute;
-    bottom: 20px;
+    bottom: 10px;
 }
 
 #anniv-banner {
