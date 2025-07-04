@@ -16,6 +16,9 @@
 
     <!-- EmailJS CDN -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <!-- Google reCAPTCHA API -->
+    <script type="text/javascript"  src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
 </head>
 <body>
     
@@ -86,22 +89,98 @@
         <div id="landing-banner" class="container-fluid banner-container">
             <div class="opaque-overlay"></div>
             <div class="row">
-                <div class="col-12">
+                <div class="col">
                     <section class="jumbotron text-center">
                         <h1 class="jumbotron-header h2">Celebrating 200 Years&#33;</h1>
                     </section>
                 </div>
             </div>
             <div class="row landing-cta-container">
-                <div class="col-12 cta-banner-container text-center">
-                    <!-- Mini call to action banner -->
-                    <div id="anniv-banner" class="cta-banner mini-banner">
-                        <div class="opaque-overlay"></div>
-                        <div class="row h-100 m-0 align-items-center">
-                            <div class="col-12">
-                                <p class="h6">Call-to-Action carousel here</p>
-                            </div>
+                <div class="col text-center">
+                    <p class="landing-cta-header m-0" aria-hidden="true">Click the image to view a larger version.</p>
+                    <!-- Call to action carousel -->
+                    <section id="cta-carousel-container" class="carousel-container carousel-auto-scroll" tabindex="0" role="group" aria-roledescription="carousel" aria-labelledby="carousel-keynav-instructions">
+                        <p id="carousel-keynav-instructions" class="mb-0 p-1 behind-all">
+                            Carousel widget - Keyboard navigation:<br>
+                            The Up and Down arrow keys switch between the slides and the navigation buttons.<br>
+                            Use the Left and Right arrow keys to navigate between slides or buttons.<br>
+                            The Escape key exits the carousel.<br>
+                            Press the Tab key to continue.
+                        </p>
+
+                        <div id="cta-carousel-nav" class="carousel-nav" role="group" aria-label="choose which slide to display">
+                            <button type="button" class="carousel-indicator current-slide" aria-disabled="true"></button>
+                            <button type="button" class="carousel-indicator"></button>
+                            <button type="button" class="carousel-indicator"></button>
+                            <button type="button" class="carousel-indicator"></button>
+                            <button type="button" class="carousel-indicator"></button>
                         </div>
+
+                        <button class="carousel-prev-btn carousel-btn" tabindex="-1" aria-hidden="true">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="carousel-next-btn carousel-btn" tabindex="-1" aria-hidden="true">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+
+                        <div id="cta-carousel" class="carousel-track-container">
+                            <ul id="cta-carousel-track" class="carousel-track" aria-atomic="false" aria-live="off" tabindex="0">
+                                <li class="carousel-slide first-slide current-slide" role="group" aria-roledescription="slide" aria-label="currently viewing slide 1 of 5" aria-hidden="false">
+                                    <a href="events.html#event-1" class="carousel-slide-link" tabindex="-1" data-toggle="modal" data-target="#cta-img-modal" aria-label="Click the image to open a modal with a larger image and a link for more information." role="button" data-description="200th Anniversary Events">
+                                        <img src="assets/images/posters/FB_IMG_1746987173251.jpg" alt="Poster for Farren's Bar's 200th anniversary events" class="cta-carousel-img carousel-img">
+                                    </a>
+                                </li>
+                                <li class="carousel-slide" role="group" aria-roledescription="slide" aria-label="currently viewing slide 2 of 5" aria-hidden="true">
+                                    <a href="shop.html#item-1" class="carousel-slide-link" tabindex="-1" data-toggle="modal" data-target="#cta-img-modal" aria-label="Click the image to open a modal with a larger image and a link for more information." role="button" data-description="Farren's Bar's Special Edition 'The Silkie' Whiskey">
+                                        <img src="assets/images/posters/FB_IMG_1747068823012.jpg" alt="Poster advertising Farren's Bar's special edition 'The Silkie' whiskey from Ardara distillery" class="cta-carousel-img carousel-img">
+                                    </a>
+                                </li>
+                                <li class="carousel-slide" role="group" aria-roledescription="slide" aria-label="currently viewing slide 3 of 5" aria-hidden="true">
+                                    <a href="events.html#event-2" class="carousel-slide-link" tabindex="-1" data-toggle="modal" data-target="#cta-img-modal" aria-label="Click the image to open a modal with a larger image and a link for more information." role="button" data-description="Jag the Joker">
+                                        <img src="assets/images/posters/FB_IMG_1747069038366.jpg" alt="Poster advertising Farren's Bar's weekly 'Jag the Joker' competition" class="cta-carousel-img carousel-img">
+                                    </a>
+                                </li>
+                                <li class="carousel-slide" role="group" aria-roledescription="slide" aria-label="currently viewing slide 4 of 5" aria-hidden="true">
+                                    <a href="events.html#event-3" class="carousel-slide-link" tabindex="-1" data-toggle="modal" data-target="#cta-img-modal" aria-label="Click the image to open a modal with a larger image and a link for more information." role="button" data-description="Talent Night">
+                                        <img src="assets/images/posters/FB_IMG_1747068993506.jpg" alt="Poster for Farren's Bar's weekly Thursday talent night" class="cta-carousel-img carousel-img">
+                                    </a>
+                                </li>
+                                <li class="carousel-slide last-slide" role="group" aria-roledescription="slide" aria-label="currently viewing slide 5 of 5" aria-hidden="true">
+                                    <a href="events.html#event-4" class="carousel-slide-link" tabindex="-1" data-toggle="modal" data-target="#cta-img-modal" aria-label="Click the image to open a modal with a larger image and a link for more information." role="button" data-description="Poker Night">
+                                        <img src="assets/images/posters/FB_IMG_1747068910572.jpg" alt="Poster for Farren's Bar's weekly Wednesday poker night" class="cta-carousel-img carousel-img">
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="carousel-exit behind-all" tabindex="0" aria-hidden="true">
+                            <p class="text-center mb-0">Exited carousel</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call-to-action image modal -->
+
+        <div id="cta-img-modal" class="modal fade carousel-modal cta-modal" tabindex="-1" role="dialog" aria-labelledby="cta-img-title" aria-describedby="cta-img-desc" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header border-0">
+                        <h2 id="cta-img-title" class="modal-title h4 text-center"></h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">X</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-body-content">
+                            <p class="text-center">Click the image for more information.</p>
+                            <div class="cta-img-wrapper"></div>
+                            <div id="cta-img-desc" class="cta-desc sr-only"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                      <button type="button" class="btn btn-cta btn-darkgrey btn-effect" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -119,7 +198,7 @@
                     <div class="col-9 h-100">
                         <section id="footer-map" class="my-3">
                             <div class="row">
-                                <div class="col-12 section-header text-center">
+                                <div class="col section-header text-center">
                                     <h6>Just Drop In&#33;</h6>
                                 </div>
                             </div>
@@ -135,7 +214,7 @@
                                             Farren's Bar,<br>
                                             Slievebawn,<br>
                                             Malin Head,<br>
-                                            Co. Donegal<br>
+                                            Co. Donegal,<br>
                                             F93 FX56,<br>
                                             Ireland.
                                         </p>
@@ -154,7 +233,7 @@
                     <div class="col-3">
                         <section id="footer-links" class="my-3">
                             <div class="row">
-                                <div class="col-12 section-content">
+                                <div class="col section-content">
                                     <!-- footer links to social media accounts, etc. -->
                                     <ul class="footer-contact-social-links d-sm-flex justify-content-around">
                                         <li class="footer-contact-link">
@@ -240,21 +319,21 @@
                 <div class="modal-body pt-0">
                     <div class="modal-body-content text-center pb-0">
                         <p id="email-info-description" class="aria-modal-description sr-only">
-                            Fill out the form below, or use the link to send a direct email to: farrens bar at hotmail.com
+                            Fill out the form below, or use the link to send a direct email to: info at farrensbar dot ie
                         </p>
                         <p id="email-modal-description" class="text-left ml-3">
                             Fill out the form below, or send a direct email to: 
-                            <a href="mailto:farrensbar@hotmail.com" aria-label="email N D T Inishowen">farrensbar&#64;hotmail.com</a>
+                            <a href="mailto:info@farrensbar.ie" aria-label="email Farren's Bar">info&#64;farrensbar.ie</a>
                         </p>
                         <p aria-hidden="true">Fields marked with &#42; are required.</p>
                         <div id="modal-email-form">
                             <form id="modal-contact-form" class="contact-form">
                                 <div class="form-row">
-                                    <div class="form-group col-12 col-sm-6">
+                                    <div class="form-group col-sm-6">
                                         <label for="modal-cf-first-name" class="sr-only">First Name (required)</label>
                                         <input type="text" id="modal-cf-first-name" name="firstname" class="form-control" placeholder="First Name&#42;" required>
                                     </div>
-                                    <div class="form-group col-12 col-sm-6">
+                                    <div class="form-group col-sm-6">
                                         <label for="modal-cf-last-name" class="sr-only">Surname (required)</label>
                                         <input type="text" id="modal-cf-last-name" name="surname" class="form-control" placeholder="Surname&#42;" required>
                                     </div>
@@ -287,12 +366,14 @@
                                     </p>
                                     <p>
                                         Instead, please send a direct email to <br>
-                                        <a href="mailto:info@ndtinishowen.ie" aria-label="email N D T Inishowen">info&#64;ndtinishowen.ie</a> <br>
+                                        <a href="info@farrensbar.ie" aria-label="email Farren's Bar">info&#64;farrensbar.ie</a> <br>
                                         or refresh the page to try again.
                                     </p>
                                 </div>
-                                <div class="col-12 text-center contact-btn-wrapper">
-                                    <button type="submit" class="btn btn-cta btn-blugrey">Get in Touch</button>
+                                <div class="col text-center p-0 contact-btn-wrapper">
+                                    <div class="g-recaptcha" data-sitekey="6Lfo2mErAAAAAMeaGh7JUjlJuMTFYmvpd24FyKcV"></div>
+                                    <br>
+                                    <button type="submit" class="btn btn-cta btn-darkgrey btn-effect">Get in Touch</button>
                                 </div>
                             </form>
                         </div>

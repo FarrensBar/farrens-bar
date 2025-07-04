@@ -25,6 +25,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    /* Get Google reCAPTCHA(s) from the page and if found, pass to
+       handler function for resizing */
+    
+    const captchas = document.querySelectorAll('.g-recaptcha');
+
+    if (captchas.length > 0) {
+        for (let captcha of captchas) {
+            // grecaptcha.enterprise.ready(resizeCaptcha(captcha));
+            /* have to use jquery '.on' instead of 'addEventListener'
+               for Bootstrap 4.3 modal events compatability */
+            $('#email-info-modal').on('shown.bs.modal', () => resizeCaptcha(captcha));
+            window.addEventListener('resize', () => resizeCaptcha(captcha));
+        }
+    }
+
     // -------------------- Main menu
 
     /* Get main menu from the DOM and pass to handler functions if
@@ -79,6 +94,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // ---------------------- Modals
+
+    const modals = document.querySelectorAll('.modal');
+
+    if (modals.length > 0) {
+        for (let modal of modals) {
+            trapKeyNavFocus(modal);
+        }
+    }
+
+    // ------------------- Landing Page
+
+    /* Get call to action carousel container element from landing page and,
+       if found, pass to carousel handler function */
+
+    const ctaCarousel = document.querySelector('#cta-carousel-container');
+
+    if (ctaCarousel) {
+        handleCarousel(ctaCarousel);
+    }    
 });
 
 // -------------------- Handler functions
@@ -240,7 +275,7 @@ function handleMainMenuDropdown(menu) {
  * 
  * Remove passed-in 'active' class name from toggler button.
  * 
- * @param {HTMLElement} parentMenu - Element containing navigation dropdowns to be handled.
+ * @param {HTMLElement} dropdown - Element containing or consisting of navigation dropdown to be handled.
  * @param {string} togglerActiveClass - Class name denoting toggle button active (popup visible).
  */
  function handleCloseNavdDropdown(dropdown, togglerActiveClass) {
@@ -542,6 +577,8 @@ function handleContactFormEmailJS(contactForm) {
     contactForm.addEventListener('submit', (e) => {
         // Prevent page from refreshing on form submit
         e.preventDefault();
+        // get Google reCAPTCHA response token
+        let captchaToken = grecaptcha.enterprise.getResponse();
         // Set parameters to be sent to EmailJS template
         // **Key values MUST match variable names in EmailJS template
         let templateParams = {
@@ -550,6 +587,7 @@ function handleContactFormEmailJS(contactForm) {
             'email_addr': contactForm.email.value,
             'phone_no': contactForm.phone.value,
             'message': contactForm.message.value,
+            "g-recaptcha-response": captchaToken,
         }
         // Call EmailJS send() method to submit form
         emailjs.send('gmail_mhcp', 'contact-form', templateParams).then(
@@ -571,9 +609,731 @@ function handleContactFormEmailJS(contactForm) {
     });
 }
 
+/**
+ * Get form to which passed-in Google reCAPTCHA has been applied and
+ * 'div' element (captchaDiv) containing reCAPTCHA iframe, if loaded in.
+ * 
+ * Get width of form and if less than 304px, add 'transform: scale'
+ * style to reCAPTCHA using ratio of captchaDiv to reCAPTCHA's parent
+ * element. If width of form greater than 304px, remove style.
+ * 
+ * @param {HTMLElement} captcha - Div element into which Google reCAPTCHA is dynamically loaded. 
+ */
+function resizeCaptcha(captcha) {
+    const parentForm = captcha.closest('form');
+    const captchaDiv = captcha.children[0];
+
+    if (captchaDiv) {
+        if (parentForm.getBoundingClientRect().width <= 304) {
+        const captchaWidth = captchaDiv.getBoundingClientRect().width;
+        const parentWidth = captcha.parentElement.getBoundingClientRect().width;
+            captcha.style.transform = `scale(${parentWidth / captchaWidth})`;
+        } else {
+            captcha.removeAttribute('style');
+        }
+    }
+}
+
 // ------------- Contact Forms & EmailJS functions end
 
+// --------------------------- Carousels
+
+/**
+ * Get 'ul' element (track) containing carousel slides from passed-in
+ * container element and pass to addClonedSlides() function.
+ * 
+ * Get all carousel slides and buttons, carousels 'exit node' element and
+ * popup 'larger image' modal, if any.
+ * 
+ * Get width of slides and use to, firstly, set initial position of
+ * carousel track, then set data attributes defining each slide's left
+ * position on track (used to set property for track transition). Set
+ * data attributes defining each slide's nodelist index. If slide's image
+ * is child of a link with an 'aria-label' attribute, incorporate image's
+ * 'alt' attribute into that link's 'aria-label'.
+ * 
+ * Set data attributes defining each carousel 'dot' indicator's nodelist
+ * index (needed for setting 'current' style after carousel transitions)
+ * and use that index to set appropriate 'aria-label' attributes.
+ * 
+ * Add 'transitionend' event listener to carousel track to indicate change
+ * in track position. Get 'current' slide and pass with track to
+ * resetInfiniteCarousel() function. Pass 'dot' indicators and 'current'
+ * slide to updateDots() function.
+ * 
+ * If carousel is to be auto-scrolling, pass track and setInterval()
+ * reference number, if any, to carouselAutoScroll() function, which
+ * returns new setInterval() reference. Add 'focus' and 'blur' event
+ * listeners to carousel container (with useCapture parameter set to true
+ * so that listeners also apply to all children) to stop/restart
+ * auto-scrolling when carousel receives/loses focus.
+ * 
+ * Add 'click' event listener to each carousel button, (using
+ * throttleEvent() function to limit clicks to max 2/sec), passing
+ * appropraite elements to moveToSlide() function.
+ * 
+ * If carousel uses 'larger image' modal, add 'click' event listeners
+ * to slide links to handle modal content with populateCtaModal() function.
+ * Add custom Bootstrap 'shown' and 'hidden' event listeners to modal to
+ * handle carousel auto-scrolling, if any, or to return focus to carousel
+ * if necessary.
+ * 
+ * Add 'keydown', 'mousedown', 'keyup', 'focusout' and 'foucusin' event
+ * listeners to carousel container, track, window and 'exit node' element
+ * to handle keyboard navigation.
+ * 
+ * Add 'touchstart' event listener to carousel container to handle
+ * auto-scrolling, if any. Pass track to handleTouchNavigation() function.
+ * 
+ * @param {HTMLElement} carouselContainer - Section element containing carousel to be handled.
+ */
+function handleCarousel(carouselContainer) {
+    let track = carouselContainer.querySelector('.carousel-track');
+    // add cloned slides for "infinite" carousel
+    track = addClonedSlides (track);
+
+    const slides = track.querySelectorAll('.carousel-slide');
+    const buttons = carouselContainer.querySelectorAll('.carousel-btn, .carousel-indicator');
+    const dots = carouselContainer.querySelectorAll('.carousel-indicator');
+    const exitNode = carouselContainer.querySelector('.carousel-exit');
+    const imgModal = document.querySelector('#cta-img-modal');
+
+    // get width of slides (should all be the same)
+    const slideWidth = slides[0].getBoundingClientRect().width;
+    // set initial track position
+    track.style.left = `-${slideWidth}px`;
+    // set slides' data attributes and if necessary, aria-labels
+    for (let [index, slide] of slides.entries()) {
+        slide.dataset.left = `${slideWidth * (index)}px`;
+        slide.dataset.index = index;
+        let slideLink = slide.querySelector('a');
+        if (slideLink) {
+            let slideImg = slideLink.querySelector('img');
+            let slideLinkAria = slideLink.getAttribute('aria-label');
+            if (slideLinkAria) {
+                slideLink.setAttribute('aria-label', `${slideImg.alt}. ${slideLinkAria}`);
+            }
+        }
+    }
+
+    // set 'dot' indicators' data and aria-label attributes
+    for (let [index, dot] of dots.entries()) {
+        dot.dataset.index = index;
+        dot.setAttribute('aria-label', `Click to view slide number ${index + 1} of ${dots.length}`)
+    }
+
+    // check (& reset) elements on each track position change
+    track.addEventListener('transitionend', () => {
+        const currentSlide = track.querySelector('.current-slide');
+        // set track position for "infinite" scrolling
+        resetInfiniteCarousel(track, currentSlide);
+        /* set 'dot' indicators' style & aria attributes based
+           on track position using current slide */
+        updateDots(dots, currentSlide);
+    });
+
+    // auto-scrolling
+    let autoScrollSetInt;
+    if (carouselContainer.classList.contains('carousel-auto-scroll')) {
+        autoScrollSetInt = carouselAutoScroll(track, autoScrollSetInt);
+        // pause auto-scrolling while any element inside carousel has focus
+        carouselContainer.addEventListener('focus', () => {
+            clearInterval(autoScrollSetInt);
+            track.setAttribute('aria-live', 'polite');
+        }, true);
+        // restart auto-scrolling when focus leaves carousel & children
+        carouselContainer.addEventListener('blur', () => {
+            autoScrollSetInt = carouselAutoScroll(track, autoScrollSetInt);
+        }, true);
+    }
+
+    // buttons (click events)
+    for (let button of buttons) {
+        button.addEventListener('click', throttleEvent(e => {
+            // Only target entire button element
+            let targetButton = e.target.closest('button');
+            if (!targetButton) return;
+
+            const currentSlide = track.querySelector('.current-slide');
+
+            if (button.classList.contains('carousel-next-btn')) {
+                const nextSlide = currentSlide.nextElementSibling;
+                moveToSlide(track, currentSlide, nextSlide);
+            } else if (button.classList.contains('carousel-prev-btn')) {
+                const prevSlide = currentSlide.previousElementSibling;
+                moveToSlide(track, currentSlide, prevSlide);
+            } else if (button.classList.contains('carousel-indicator')) {
+                const targetIndex = parseInt(button.dataset.index);
+                const targetSlide = slides[targetIndex + 1];
+                moveToSlide(track, currentSlide, targetSlide);
+            } else return;
+        // Pass 500ms time interval to throttleEvent function
+        }, 500));
+    }
+
+    // image clicks (open modal)
+    let openedWithKey = false;  // used to differentiate between mouse & 'Enter' key
+    if (imgModal) {
+        for (let slide of slides) {
+            const slideImgLink = slide.querySelector('a');
+            if (slideImgLink) {
+                slideImgLink.addEventListener('click', e => {
+                    // only target anchor element
+                    let targetLink = e.target.closest('a');
+                    if (!targetLink) return;
+                    // prevent anchor element navigating to its 'href'
+                    e.preventDefault();
+                    populateCtaModal(imgModal, targetLink);
+                });
+            }
+        }
+        /* pause carousel auto-scrolling on modal open, return
+           focus to carousel on modal close if using keyboard
+           navigation (have to use jquery '.on' instead of
+           'addEventListener' for Bootstrap 4.3 modal events
+           compatability) */
+        $(imgModal).on('shown.bs.modal', () => {
+            if (carouselContainer.classList.contains('carousel-auto-scroll')) {
+                clearInterval(autoScrollSetInt);
+                track.setAttribute('aria-live', 'polite');
+            }
+        });
+        $(imgModal).on('hidden.bs.modal', () => {
+            if (openedWithKey) {
+                track.focus();
+                openedWithKey = false;
+            }
+        });
+    }
+
+    // general keyboard navigation
+    carouselContainer.addEventListener('keydown', (e) => {
+        // indicator/navigation 'dots'
+        if (e.target.classList.contains('carousel-indicator')) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+            }
+            if ((e.key === 'ArrowUp') || (e.key === 'ArrowDown')) {
+                e.preventDefault();
+                track.focus();
+            }
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                exitNode.setAttribute('aria-hidden', 'false');
+                exitNode.focus();
+            }
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                const nextDot = e.target.nextElementSibling;
+                if (nextDot) {
+                    nextDot.focus();
+                } else {
+                    dots[0].focus();
+                }
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const prevDot = e.target.previousElementSibling;
+                if (prevDot) {
+                    prevDot.focus();
+                } else {
+                    dots[dots.length - 1].focus();
+                }
+            }
+        // carousel track/slides
+        } else if (e.target === track) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+            }
+            if ((e.key === 'ArrowUp') || (e.key === 'ArrowDown')) {
+                e.preventDefault();
+                carouselContainer.querySelector('button.current-slide').focus();
+            }
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                exitNode.setAttribute('aria-hidden', 'false');
+                exitNode.focus();
+            }
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (imgModal) {
+                    const slideLink = track.querySelector('.current-slide a');
+                    if (slideLink) {
+                        populateCtaModal(imgModal, slideLink);
+                    }
+                    /* have to use jquery for Bootstrap 4.3 modal compatability
+                    - manually display modal */
+                    $(imgModal).modal('show');
+                    openedWithKey = true;
+                }
+            }
+        // exit node
+        } else if (e.target === exitNode) {
+            exitNode.setAttribute('aria-hidden', 'true');
+            // set focus back to start of carousel if tabbing in reverse
+            if ((e.key === 'Tab') && e.shiftKey) {
+                e.preventDefault();
+                carouselContainer.focus();
+            }
+        }
+    });
+    /* throttled event listener for carousel slide keyboard navigation
+       - required in order to allow track transition to finish so that
+       position is updated */
+    track.addEventListener('keydown', throttleEvent(e => {
+        const currentSlide = track.querySelector('.current-slide');
+        if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            const nextSlide = currentSlide.nextElementSibling;
+            moveToSlide(track, currentSlide, nextSlide);
+        }
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            const prevSlide = currentSlide.previousElementSibling;
+            moveToSlide(track, currentSlide, prevSlide);
+        }
+    // Pass 500ms time interval to throttleEvent function
+    }, 500));
+    // prevent keyboard nav instructions from showing on mouse click
+    carouselContainer.addEventListener('mousedown', () => {
+        carouselContainer.querySelector('#carousel-keynav-instructions').classList.remove('in-front');
+        carouselContainer.querySelector('#carousel-keynav-instructions').classList.add('behind-all');
+    });
+    /* show keyboard nav instructions when carousel receives focus from
+       tab key use */
+    window.addEventListener('keyup', (e) => {
+        if (e.key === 'Tab') {
+            if (e.target === carouselContainer) {
+                carouselContainer.querySelector('#carousel-keynav-instructions').classList.remove('behind-all');
+                carouselContainer.querySelector('#carousel-keynav-instructions').classList.add('in-front');
+            } else {
+                carouselContainer.querySelector('#carousel-keynav-instructions').classList.remove('in-front');
+                carouselContainer.querySelector('#carousel-keynav-instructions').classList.add('behind-all');
+            }
+        }
+    });
+    // hide keyboard nav instructions when focus moves on
+    carouselContainer.addEventListener('focusout', () => {
+        carouselContainer.querySelector('#carousel-keynav-instructions').classList.remove('in-front');
+        carouselContainer.querySelector('#carousel-keynav-instructions').classList.add('behind-all');
+    });
+    // show carousel exit node when it receives focus
+    exitNode.addEventListener('focusin', () => {
+        exitNode.classList.remove('behind-all');
+    });
+    // hide carousel exit node when focus moves on
+    exitNode.addEventListener('focusout', () => {
+        exitNode.classList.add('behind-all');
+    });
+
+    // pause carousel auto-scrolling on touch
+    carouselContainer.addEventListener('touchstart', () => {
+        if (carouselContainer.classList.contains('carousel-auto-scroll')) {
+            clearInterval(autoScrollSetInt);
+            track.setAttribute('aria-live', 'polite');
+        } 
+    });
+    // touch/swipe navigation
+    handleTouchNavigation(track);
+}
+
+/**
+ * Clone first and last slides from passed-in track element, including
+ * any children and set appropriate classes / aria attributes.
+ * 
+ * Insert last slide clone at beginning of track and insert first slide
+ * clone at end.
+ * 
+ * Return new track.
+ * 
+ * @param {HTMLElement} track - Element containing carousel slides.
+ * @returns {HTMLElement} - Modified track element.
+ */
+function addClonedSlides (track) {
+    const lastSlideClone = track.lastElementChild.cloneNode(true);
+    lastSlideClone.classList.add('last-slide-clone');
+    lastSlideClone.classList.remove('last-slide');
+    lastSlideClone.setAttribute('aria-hidden', 'true');
+
+    const firstSlideClone = track.firstElementChild.cloneNode(true);
+    firstSlideClone.classList.add('first-slide-clone');
+    firstSlideClone.classList.remove('first-slide', 'current-slide');
+    firstSlideClone.setAttribute('aria-hidden', 'true');
+
+    track.insertBefore(lastSlideClone, track.firstElementChild);
+    track.appendChild(firstSlideClone);
+
+    return track;
+}
+
+/**
+ * Get first and last slides from passed-in track element.
+ * 
+ * If passed-in currentSlide element is clone of either the first or last
+ * slides, remove css 'transition' class from track element (rendering
+ * track position change invisible to user) and change track position by
+ * setting its left style property from 'data-left' attribute of the slide
+ * whose clone was detected.
+ * 
+ * Switch 'current-slide' class and 'aria-hidden' attributes of currentSlide
+ * element and new 'current' slide.
+ * 
+ * @param {HTMLElement} track - Element containing carousel slides.
+ * @param {HTMLElement} currentSlide - Slide element with class indicating that it's currently visible in carousel viewport.
+ */
+function resetInfiniteCarousel(track, currentSlide) {
+    const firstSlide = track.querySelector('.first-slide');
+    const lastSlide = track.querySelector('.last-slide');
+
+    if (currentSlide.classList.contains('last-slide-clone')) {
+        track.classList.remove('carousel-trans-left');
+        track.style.left = `-${lastSlide.dataset.left}`;
+        currentSlide.classList.remove('current-slide');
+        currentSlide.setAttribute('aria-hidden', 'true');
+        lastSlide.classList.add('current-slide');
+        lastSlide.setAttribute('aria-hidden', 'false');
+    } else if (currentSlide.classList.contains('first-slide-clone')) {
+        track.classList.remove('carousel-trans-left');
+        track.style.left = `-${firstSlide.dataset.left}`;
+        currentSlide.classList.remove('current-slide');
+        currentSlide.setAttribute('aria-hidden', 'true');
+        firstSlide.classList.add('current-slide');
+        firstSlide.setAttribute('aria-hidden', 'false');
+    }
+}
+
+/**
+ * Get first and last 'dot' indicator buttons from passed-in node list.
+ * 
+ * Remove 'current' class and 'aria-disabled' attribute from each button in
+ * list.
+ * 
+ * If passed-in currentSlide element is clone of either the first or last
+ * slides in carousel track element, set 'current' class (for styling) and
+ * 'aria-disabled' attribute on first or last button, as appropriate. If
+ * currentSlide element's 'data-index' attribute matches button's position in
+ * node list (indicated by its own 'data-index' attribute), set 'current'
+ * class and 'aria-disabled' attribute on button.
+ * 
+ * @param {NodeList} dots - Carousel 'dot' indicator buttons.
+ * @param {HTMLElement} currentSlide - Slide element with class indicating that it's currently visible in carousel viewport.
+ */
+function updateDots(dots, currentSlide) {
+    const firstDot = dots[0];
+    const lastDot = dots[dots.length - 1];
+
+    for (let dot of dots) {
+        dot.classList.remove('current-slide');
+        dot.removeAttribute('aria-disabled');
+        if (currentSlide.classList.contains('last-slide-clone')) {
+            lastDot.classList.add('current-slide');
+            lastDot.setAttribute('aria-disabled', 'true');
+        } else if (currentSlide.classList.contains('first-slide-clone')) {
+            firstDot.classList.add('current-slide');
+            firstDot.setAttribute('aria-disabled', 'true');
+        } else if (currentSlide.dataset.index === `${parseInt(dot.dataset.index) + 1}`) {
+            dot.classList.add('current-slide');
+            dot.setAttribute('aria-disabled', 'true');
+        }
+    }
+}
+
+/**
+ * If user's browser preferences set to 'prefers reduced motion, exit
+ * function.
+ * 
+ * Clear currently running setInterval() function using passed-in reference,
+ * so not running multiple functions simultaneously (would continuously
+ * increase slide change speed).
+ * 
+ * Set passed-in track element's 'aria-live' attribute to off and begin new
+ * setInterval() function to call moveToSlide() function every 8s.
+ * 
+ * Return reference for new setInterval() function.
+ * 
+ * @param {HTMLElement} track - Element containing carousel slides.
+ * @param {number} intv - Reference for currently running setInterval() function, if any.
+ * @returns {number} - Reference for new setInterval() function.
+ */
+function carouselAutoScroll(track, intv) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+    }
+    /* clear interval every time so not running multiple
+       setInterval() functions simultaneously, increasing
+       slide change speed */
+    clearInterval(intv);
+    track.setAttribute('aria-live', 'off');
+    intv = setInterval(() => {
+        const currentSlide = track.querySelector('.current-slide');
+        const targetSlide = currentSlide.nextElementSibling;
+        moveToSlide(track, currentSlide, targetSlide);
+        console.log(intv);
+    // 8 sec slide change interval
+    }, 8000);
+    // return new setInterval() reference
+    return intv;
+}
+
+/**
+ * Get passed-in targetSlide element's 'data-left' attribute, add css
+ * 'transition' class to passed-in track element and change track
+ * position by setting its left style property to targetSlide's
+ * 'data-left' attribute.
+ * 
+ * Switch 'current-slide' class and 'aria-hidden' attributes of passed-in
+ * currentSlide element and targetSlide.
+ * 
+ * @param {HTMLElement} track - Element containing carousel slides.
+ * @param {HTMLElement} currentSlide - Slide element with class indicating that it's currently visible in carousel viewport.
+ * @param {HTMLElement} targetSlide - Slide element to become visible in carousel viewport.
+ */
+function moveToSlide(track, currentSlide, targetSlide) {
+    const moveValue = targetSlide.dataset.left;
+    
+    track.classList.add('carousel-trans-left');
+    track.style.left = `-${moveValue}`;
+    currentSlide.classList.remove('current-slide');
+    currentSlide.setAttribute('aria-hidden', 'true');
+    targetSlide.classList.add('current-slide');
+    targetSlide.setAttribute('aria-hidden', 'false');
+}
+
+/**
+ * Get passed-in modal element's 'title' ('h2') and image container ('div')
+ * elements.
+ * Clone passed-in anchor element with its children (carousel slide image).
+ * Get modal's 'description' element (for screen readers). Create
+ * description text from cloned image's 'alt' attribute and paragraph
+ * element to contain it.
+ * 
+ * Remove all redundant attributes from cloned anchor element and set its
+ * 'aria-label' attribute, using its 'data-description' attribute.
+ * 
+ * Clear image container element and append cloned anchor+image element.
+ * 
+ * Set cloned anchor element's 'data-description' text as modal's title.
+ * 
+ * Add description text to new paragraph elment, clear 'description'
+ * element and append paragraph.
+ * 
+ * @param {HTMLElement} imgModal - Popup modal element to contain larger version of selected carousel slide image.
+ * @param {HTMLElement} imgLink - Anchor element, parent of selected carousel slide image, to be cloned and altered to populate imgModal.
+ */
+function populateCtaModal(imgModal, imgLink) {
+    const title = imgModal.querySelector('.modal-title');
+    const imgLinkContainer = imgModal.querySelector('.cta-img-wrapper');
+    const newLink = imgLink.cloneNode(true);
+    const imgDescription = imgModal.querySelector('.cta-desc');
+    const descriptionText = newLink.querySelector('img').alt;
+    const descriptionPar = document.createElement('p');
+
+    newLink.removeAttribute('tabindex');
+    newLink.removeAttribute('data-toggle');
+    newLink.removeAttribute('data-target');
+    newLink.removeAttribute('role');
+    newLink.setAttribute('aria-label', `${newLink.dataset.description}. Click here for more information.`);
+    imgLinkContainer.innerHTML = '';
+    imgLinkContainer.appendChild(newLink);
+    
+    title.innerHTML = newLink.dataset.description;
+
+    descriptionPar.innerHTML = `${descriptionText}. Click the image for more information`;
+    imgDescription.innerHTML = '';
+    imgDescription.appendChild(descriptionPar);
+}
+
+/**
+ * Get carousel's main image viewport (track container) & add touch
+ * event listeners to it:
+ * 
+ * 'touchstart' - Record x & y coordinates and time of first touch;
+ * 
+ * 'touchmove' - Determine if swiping horizontally or vertically.
+ * If condition met for valid horizontal swipe, return true and
+ * prevent page scrolling for duration of touch.
+ * 
+ * 'touchend' - Limit touch events to max 2 per second. Record x
+ * coordinate at end of touch. If horizontal swipe, prevent click
+ * events in viewport, pass start & end x coordinates and time of
+ * first touch to handleSwipe function, get returned swipe
+ * direction and pass to handleSwipeDirection function.
+ * 
+ * @param {HTMLElement} track - Element containing carousel slides.
+ */
+function handleTouchNavigation(track) {
+    // Carousel viewport
+    const view = track.parentElement;
+    // Throttling variable to limit click events
+    let enableSwipe = true;
+    // Starting X and Y coordinates
+    let startX = null;
+    let startY = null;
+    // Swiping horizontally?
+    let swipingX = false;
+    // Time of first touch
+    let startTime;
+
+    view.addEventListener('touchstart', (e) => {
+        // Record x and y coordinates of first touch
+        startX = e.changedTouches[0].clientX;
+        startY = e.changedTouches[0].clientY;
+        // Record time of first touch
+        startTime = new Date().getTime();
+    });
+
+    view.addEventListener('touchmove', (e) => {
+        // To prevent error when maths operations applied:
+        if (startX === null || startY === null) return;
+        
+        // Track distance of touch across screen
+        let currentX = e.changedTouches[0].clientX;
+        let currentY = e.changedTouches[0].clientY;
+        let currentDistX = startX - currentX;
+        let currentDistY = startY - currentY;
+        // Maximum y-axis distance allowed for horizontal swipe
+        let tolerance = 100;
+
+        // Only run if swiping horizontally within tolerance
+        if (Math.abs(currentDistX) > Math.abs(currentDistY) && Math.abs(currentDistY) <= tolerance && e.cancelable) {
+            swipingX = true; // Horizontal swipe
+            // Prevent scrolling when inside image viewport
+            e.preventDefault();
+        }
+    });
+
+    view.addEventListener('touchend', (e) => {
+        // Only run if throttling allows
+        if (!enableSwipe) return;
+        enableSwipe = false;
+        // To prevent error when maths operations applied:
+        if (startX === null || startY === null) return;
+
+        // Record x coordinate of touch leaving screen
+        let endX = e.changedTouches[0].clientX;
+
+        // Only run if swiping horizontally
+        if (swipingX && e.cancelable) {
+            // Direction of swipe returned by handleSwipe function
+            let swipeDirection = handleSwipe(startX, startTime, endX);
+
+            handleSwipeDirection(track, swipeDirection);
+            // Reset x and y coordinates
+            startX = null;
+            startY = null;
+            // Prevent click events inside image viewport
+            e.preventDefault();
+            // Reset swiping state to restore defaults after each swipe
+            swipingX = false;
+        }
+
+        /* Only register touchend events every 600ms
+           (i.e. limit user to max 2 swipes/second) */
+        setTimeout(function() {
+            enableSwipe = true;
+        }, 600);
+    });
+}
+
+/**
+ * If conditions met for valid horizontal swipe, return swipe
+ * direction.
+ * 
+ * @param {number} startX - X coordinate passed in by touchstart event listener.
+ * @param {number} startTime - Time recorded by touchstart event listener.
+ * @param {number} endX - X coordinate passed in by touchend event listener.
+ * @returns {string} swipeDirection - Direction ('left' or 'right') determined by difference between startX and endX.
+ */
+function handleSwipe(startX, startTime, endX) {
+    // Get distance moved horizontally
+    let distX = startX - endX;
+    // Minimum distance in pixels required for valid swipe
+    let threshold = 100;
+    // Get time since first touch
+    let elapsedTime = new Date().getTime() - startTime;
+    // Minimum touch duration in ms required for valid swipe
+    let allowedTime = 300;
+    // Direction of swipe
+    let swipeDirection;
+
+    // Only run if conditions met for valid horizontal swipe
+    // if (Math.abs(distX) >= threshold && elapsedTime <= allowedTime) {
+    if (Math.abs(distX) >= threshold && elapsedTime >= allowedTime) {
+        /* Ternary if statement. Set direction of swipe
+           if dist moved + or - */
+        swipeDirection = (distX > 0) ? 'left' : 'right';
+    }
+    return swipeDirection;
+}
+
+/**
+ * Get currently viewed slide by querying slide track.
+ * 
+ * If passed in swipe direction is left, get next slide in track.
+ * If right, get previous slide in track.
+ * 
+ * Pass track, current slide & next/previous slide to moveToSlide
+ * function.
+ * 
+ * @param {HTMLElement} track - Element containing carousel slides.
+ * @param {string} swipeDirection - Direction ('left' or 'right') passed in by touchend event listener.
+ */
+function handleSwipeDirection(track, swipeDirection) {
+    const currentSlide = track.querySelector('.current-slide');
+
+    if (swipeDirection === 'left') {
+        const nextSlide = currentSlide.nextElementSibling;
+        moveToSlide(track, currentSlide, nextSlide);
+    } else if (swipeDirection === 'right') {
+        const prevSlide = currentSlide.previousElementSibling;
+        moveToSlide(track, currentSlide, prevSlide);
+    } else return; // exit function if direction undefined/falsy
+}
+
+// -------------------- Carousels functions end
+
 // ------------------- Miscellaneous functions
+
+// Trapping focus inside elements for keyboard navigation accessibility (e.g. modals)
+
+/**
+ * Get all focusable elements within passed in element and find
+ * the first and last.
+ * 
+ * Listen for 'tab' or 'shift + tab' keypresses to signify keyboard
+ * navigation and if the active element is first in the list on 
+ * 'shift + tab' (backwards navigation), set focus to the first (and
+ * vice-versa).
+ *  
+ * @param {HTMLElement} element - Element (modal, etc) in which focus is to be trapped
+ */
+function trapKeyNavFocus(element) {
+    const focusableEls = element.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])');
+    const firstFocusableEl = focusableEls[0];  
+    const lastFocusableEl = focusableEls[focusableEls.length - 1];
+  
+    element.addEventListener('keydown', (e) => {
+        let isTabPressed = (e.key === 'Tab');
+    
+        if (!isTabPressed) { 
+            return; 
+        }
+    
+        if ( e.shiftKey ) {
+        // Shift + Tab
+            if (document.activeElement === firstFocusableEl) {
+                lastFocusableEl.focus();
+                e.preventDefault();
+            }
+        } else {
+        // Tab
+            if (document.activeElement === lastFocusableEl) {
+                firstFocusableEl.focus();
+                e.preventDefault();
+            }
+        }
+    });
+}
 
 // Applying 'active' class to navigation links when associated page section in view
 
