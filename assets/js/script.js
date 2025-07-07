@@ -104,16 +104,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // -------------------- Carousels
+
+    const carouselContainers = document.querySelectorAll('.carousel-container');
+
+    if (carouselContainers.length > 0) {
+        for (let container of carouselContainers) {
+            handleCarousel(container);
+        }
+    }
+
     // ------------------- Landing Page
 
     /* Get call to action carousel container element from landing page and,
        if found, pass to carousel handler function */
 
-    const ctaCarousel = document.querySelector('#cta-carousel-container');
+    // const ctaCarousel = document.querySelector('#cta-carousel-container');
 
-    if (ctaCarousel) {
-        handleCarousel(ctaCarousel);
-    }    
+    // if (ctaCarousel) {
+    //     handleCarousel(ctaCarousel);
+    // }
 });
 
 // -------------------- Handler functions
@@ -650,16 +660,17 @@ function resizeCaptcha(captcha) {
  * position on track (used to set property for track transition). Set
  * data attributes defining each slide's nodelist index. If slide's image
  * is child of a link with an 'aria-label' attribute, incorporate image's
- * 'alt' attribute into that link's 'aria-label'.
+ * 'alt' attribute into that link's 'aria-label'. Add 'resize' event
+ * listener to window to dynamically change each slide's 'data-left'
+ * attribute.
  * 
  * Set data attributes defining each carousel 'dot' indicator's nodelist
  * index (needed for setting 'current' style after carousel transitions)
  * and use that index to set appropriate 'aria-label' attributes.
  * 
- * Add 'transitionend' event listener to carousel track to indicate change
- * in track position. Get 'current' slide and pass with track to
- * resetInfiniteCarousel() function. Pass 'dot' indicators and 'current'
- * slide to updateDots() function.
+ * Add 'transitionend' and 'animationend' event listeners to carousel track
+ * to indicate change in track position. Get 'current' slide and pass with
+ * track to resetInfiniteCarousel() function.
  * 
  * If carousel is to be auto-scrolling, pass track and setInterval()
  * reference number, if any, to carouselAutoScroll() function, which
@@ -699,7 +710,7 @@ function handleCarousel(carouselContainer) {
     const imgModal = document.querySelector('#cta-img-modal');
 
     // get width of slides (should all be the same)
-    const slideWidth = slides[0].getBoundingClientRect().width;
+    let slideWidth = slides[0].getBoundingClientRect().width;
     // set initial track position
     track.style.left = `-${slideWidth}px`;
     // set slides' data attributes and if necessary, aria-labels
@@ -715,6 +726,23 @@ function handleCarousel(carouselContainer) {
             }
         }
     }
+    // adjust track position dynamically on window resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        slideWidth = slides[0].getBoundingClientRect().width;
+        for (let [index, slide] of slides.entries()) {
+            slide.dataset.left = `${slideWidth * (index)}px`;
+        }
+        /* setTimeout variable used to hide track transition until
+           400ms after window resize finished */
+        if (resizeTimer) clearTimeout(resizeTimer);
+        track.classList.add('behind-all');
+        const currentSlide = track.querySelector('.current-slide');
+        track.style.left = `-${currentSlide.dataset.left}`;
+        resizeTimer = setTimeout(() => {
+            track.classList.remove('behind-all');
+        }, 400);
+    });
 
     // set 'dot' indicators' data and aria-label attributes
     for (let [index, dot] of dots.entries()) {
@@ -727,9 +755,11 @@ function handleCarousel(carouselContainer) {
         const currentSlide = track.querySelector('.current-slide');
         // set track position for "infinite" scrolling
         resetInfiniteCarousel(track, currentSlide);
-        /* set 'dot' indicators' style & aria attributes based
-           on track position using current slide */
-        updateDots(dots, currentSlide);
+    });
+    track.addEventListener('animationend', () => {
+        const currentSlide = track.querySelector('.current-slide');
+        // set track position for "infinite" scrolling
+        resetInfiniteCarousel(track, currentSlide);
     });
 
     // auto-scrolling
@@ -814,6 +844,9 @@ function handleCarousel(carouselContainer) {
                 e.preventDefault();
             }
             if ((e.key === 'ArrowUp') || (e.key === 'ArrowDown')) {
+                /* prevent navigation to slides if carousel is events page 
+                   banner 'tv' */
+                if (e.target.parentElement.id === 'tv-carousel-nav') return;
                 e.preventDefault();
                 track.focus();
             }
@@ -896,26 +929,26 @@ function handleCarousel(carouselContainer) {
     }, 500));
     // prevent keyboard nav instructions from showing on mouse click
     carouselContainer.addEventListener('mousedown', () => {
-        carouselContainer.querySelector('#carousel-keynav-instructions').classList.remove('in-front');
-        carouselContainer.querySelector('#carousel-keynav-instructions').classList.add('behind-all');
+        carouselContainer.querySelector('.carousel-keynav-instructions').classList.remove('in-front');
+        carouselContainer.querySelector('.carousel-keynav-instructions').classList.add('behind-all');
     });
     /* show keyboard nav instructions when carousel receives focus from
        tab key use */
     window.addEventListener('keyup', (e) => {
         if (e.key === 'Tab') {
             if (e.target === carouselContainer) {
-                carouselContainer.querySelector('#carousel-keynav-instructions').classList.remove('behind-all');
-                carouselContainer.querySelector('#carousel-keynav-instructions').classList.add('in-front');
+                carouselContainer.querySelector('.carousel-keynav-instructions').classList.remove('behind-all');
+                carouselContainer.querySelector('.carousel-keynav-instructions').classList.add('in-front');
             } else {
-                carouselContainer.querySelector('#carousel-keynav-instructions').classList.remove('in-front');
-                carouselContainer.querySelector('#carousel-keynav-instructions').classList.add('behind-all');
+                carouselContainer.querySelector('.carousel-keynav-instructions').classList.remove('in-front');
+                carouselContainer.querySelector('.carousel-keynav-instructions').classList.add('behind-all');
             }
         }
     });
     // hide keyboard nav instructions when focus moves on
     carouselContainer.addEventListener('focusout', () => {
-        carouselContainer.querySelector('#carousel-keynav-instructions').classList.remove('in-front');
-        carouselContainer.querySelector('#carousel-keynav-instructions').classList.add('behind-all');
+        carouselContainer.querySelector('.carousel-keynav-instructions').classList.remove('in-front');
+        carouselContainer.querySelector('.carousel-keynav-instructions').classList.add('behind-all');
     });
     // show carousel exit node when it receives focus
     exitNode.addEventListener('focusin', () => {
@@ -1076,27 +1109,53 @@ function carouselAutoScroll(track, intv) {
 }
 
 /**
+ * Get passed-in track element's 'frame' parent element, if any. Get
+ * track element's parent carousel's navigation 'dot' indicator buttons.
+ * 
  * Get passed-in targetSlide element's 'data-left' attribute, add css
- * 'transition' class to passed-in track element and change track
+ * 'transition' or 'animation' classes to passed-in track element (and
+ * 'frame' element if present) depending on carousel type. Change track
  * position by setting its left style property to targetSlide's
- * 'data-left' attribute.
+ * 'data-left' attribute, setting timeouts and removing 'animation'
+ * classes if called for by carousel type.
  * 
  * Switch 'current-slide' class and 'aria-hidden' attributes of passed-in
  * currentSlide element and targetSlide.
+ * 
+ * Pass 'dot' indicator buttons and targetSlide to updateDots() function.
  * 
  * @param {HTMLElement} track - Element containing carousel slides.
  * @param {HTMLElement} currentSlide - Slide element with class indicating that it's currently visible in carousel viewport.
  * @param {HTMLElement} targetSlide - Slide element to become visible in carousel viewport.
  */
 function moveToSlide(track, currentSlide, targetSlide) {
+    const carouselFrame = track.closest('.carousel-frame');
+    const dots = track.closest('.carousel-container').querySelectorAll('.carousel-indicator');
     const moveValue = targetSlide.dataset.left;
     
-    track.classList.add('carousel-trans-left');
-    track.style.left = `-${moveValue}`;
+    if (track.classList.contains('carousel-fade')) {
+        track.classList.add('carousel-trans-fade');
+        if (carouselFrame && carouselFrame.classList.contains('tv-frame')) {
+            carouselFrame.classList.add('tv-flicker');
+        }
+        setTimeout(() => {
+            track.style.left = `-${moveValue}`;
+        }, 1000);
+        setTimeout(() => {
+            track.classList.remove('carousel-trans-fade');
+            if (carouselFrame && carouselFrame.classList.contains('tv-frame')) {
+            carouselFrame.classList.remove('tv-flicker');
+            }
+        }, 2100);
+    } else {
+        track.classList.add('carousel-trans-left');
+        track.style.left = `-${moveValue}`;
+    }
     currentSlide.classList.remove('current-slide');
     currentSlide.setAttribute('aria-hidden', 'true');
     targetSlide.classList.add('current-slide');
     targetSlide.setAttribute('aria-hidden', 'false');
+    updateDots(dots, targetSlide);
 }
 
 /**

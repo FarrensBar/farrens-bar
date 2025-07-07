@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Farren's Bar, Ireland's most northerly bar, Malin Head, County Donegal, Ireland">
+    <meta name="keywords" content="Farren's Bar, Ireland's most northerly bar, Malin Head bar, bar in Malin Head, pub in Co Donegal, Irish bar since 1825, historic Irish pub, traditional Irish bar, Farren's Malin Head, Donegal coast pub, Irish heritage pub, oldest bar Malin Head, coastal bar Ireland, scenic Irish bar, Atlantic Way pub, Wild Atlantic Way bar, local Donegal bar, family-run Irish pub, Malin Head drinks, Malin Head food, drinks, food, beer, whiskey, vodka, rum, tequila, spirits, cocktails, Malin Head Guinness, Guinness, Best Guinness in Donegal, Donegal's best pint, Donegal's best Guinness, Irish pub experience, Guinness Donegal, Irish beer bar, Irish whiskey bar, live music Donegal pub, friendly Irish pub, iconic Irish bar, must-visit Donegal bar, authentic Irish bar, Irish pub with history, famous Donegal bar, Irish coastal bar, pub with sea views Ireland, Irish pub culture, Ireland tourism bar, Irish landmark pub, Farren's Bar Donegal, Ireland's northernmost pub, historic Donegal landmark, Irish bar with history, Irish bar 1825, local drinks Malin Head, bar near Malin Head, Irish pub at Ireland's edge, top Donegal attractions, Ireland travel pubs, Irish bar with atmosphere">
+
+    <!-- Bootstrap css link -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- Custom css -->
+    <link rel="stylesheet" href="assets/css/style.css" type="text/css">
+    <title>Farren's Bar</title>
+
+    <!-- EmailJS CDN -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <!-- Google reCAPTCHA API -->
+    <script type="text/javascript"  src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
+</head>
+<body>
+    
+    <header id="main-header">
+        
+        <div id="header-logo">
+            <a href="index.html">
+                <img src="assets/images/farrens-logo-neg-trans.png" alt="Farren's Bar logo">
+            </a>
+        </div>
+
+        <nav id="main-menu" class="popup-container" role="navigation">
+
+            <!-- dropdown menu button for smaller screens -->
+            <button id="main-menu-btn" class="menu-toggle-btn toggle-btn" aria-expanded="false" aria-controls="main-menu-items">
+                <span class="menu-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </button>
+
+            <!-- main menu links -->
+            <div id="main-menu-items" class="main-menu-responsive">
+                <ul>
+                    <li>
+                        <a href="index.html" class="main-menu-item">Home</a>
+                    </li>
+                    <li>
+                        <a href="history.html" class="main-menu-item">History</a>
+                    </li>
+                    <li>
+                        <a href="events.html" class="active-link main-menu-item">Events</a>
+                    </li>
+                    <li>
+                        <a href="shop.html" class="main-menu-item">Shop</a>
+                    </li>
+
+                    <!-- Additional links dropdown list -->
+                    <li class="navbar-dropdown-menu-container">
+                        <button id="more-dropdown-btn" class="main-menu-item navbar-dropdown-btn menu-toggle-btn toggle-btn" aria-expanded="false" aria-controls="navbar-more-menu">
+                            <span class="menu-btn-text">More</span>
+                        </button>
+                        <div id="navbar-more-menu" class="navbar-dropdown-menu">
+                            <ul>
+                                <li>
+                                    <a href="food.html" class="navbar-dropdown-item">Food</a>
+                                </li>
+                                <li>
+                                    <a href="gallery.html" class="navbar-dropdown-item">Photo Gallery</a>
+                                </li>
+                                <li>
+                                    <a href="contact.html" class="navbar-dropdown-item">Contact Us</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+        
+    </header>
+
+    <main>
+
+        <!-- Jumbotron, banner image & call to action -->
+        <div id="events-banner" class="container-fluid banner-container pb-3">
+            <div id="events-banner-container" class="row">
+                <div class="col text-center">
+                    <h1 class="h2 mt-3 mb-2">Upcoming Events</h1>
+                    <!-- Events TV carousel -->
+                    <section id="tv-carousel-container" class="carousel-container carousel-auto-scroll" tabindex="0" role="group" aria-roledescription="carousel" aria-labelledby="tv-carousel-keynav-instructions">
+                        <p id="tv-carousel-keynav-instructions" class="carousel-keynav-instructions mb-0 behind-all">
+                            Carousel widget - Keyboard navigation:<br>
+                            Use the Left and Right arrow keys to navigate between buttons.<br>
+                            The Escape key exits the carousel.<br>
+                            Press the Tab key to continue.
+                        </p>
+
+                        <div id="tv-carousel-nav" class="carousel-nav" role="group" aria-label="choose which slide to display">
+                            <button type="button" class="carousel-indicator current-slide" aria-disabled="true"></button>
+                            <button type="button" class="carousel-indicator"></button>
+                            <button type="button" class="carousel-indicator"></button>
+                            <button type="button" class="carousel-indicator"></button>
+                            <button type="button" class="carousel-indicator"></button>
+                        </div>
+
+                        <div id="tv-carousel-frame" class="carousel-frame tv-frame">
+                            <div id="tv-carousel" class="carousel-track-container tv-screen">
+                                <ul id="tv-carousel-track" class="carousel-track carousel-fade" aria-atomic="false" aria-live="off">
+                                    <li class="carousel-slide first-slide current-slide" role="group" aria-roledescription="slide" aria-label="currently viewing slide 1 of 5" aria-hidden="false">
+                                        <img src="assets/images/posters/FB_IMG_1746987173251.jpg" alt="Poster for Farren's Bar's 200th anniversary events" class="cta-carousel-img carousel-img">
+                                    </li>
+                                    <li class="carousel-slide" role="group" aria-roledescription="slide" aria-label="currently viewing slide 2 of 5" aria-hidden="true">
+                                        <img src="assets/images/posters/FB_IMG_1747068823012.jpg" alt="Poster advertising Farren's Bar's special edition 'The Silkie' whiskey from Ardara distillery" class="cta-carousel-img carousel-img">
+                                    </li>
+                                    <li class="carousel-slide" role="group" aria-roledescription="slide" aria-label="currently viewing slide 3 of 5" aria-hidden="true">
+                                        <img src="assets/images/posters/FB_IMG_1747069038366.jpg" alt="Poster advertising Farren's Bar's weekly 'Jag the Joker' competition" class="cta-carousel-img carousel-img">
+                                    </li>
+                                    <li class="carousel-slide" role="group" aria-roledescription="slide" aria-label="currently viewing slide 4 of 5" aria-hidden="true">
+                                        <img src="assets/images/posters/FB_IMG_1747068993506.jpg" alt="Poster for Farren's Bar's weekly Thursday talent night" class="cta-carousel-img carousel-img">
+                                    </li>
+                                    <li class="carousel-slide last-slide" role="group" aria-roledescription="slide" aria-label="currently viewing slide 5 of 5" aria-hidden="true">
+                                        <img src="assets/images/posters/FB_IMG_1747068910572.jpg" alt="Poster for Farren's Bar's weekly Wednesday poker night" class="cta-carousel-img carousel-img">
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="carousel-exit behind-all" tabindex="0" aria-hidden="true">
+                            <p class="text-center mb-0">Exited carousel</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-wrapper">
+            <div class="container content-container events-container">
+                <section id="events" class="events-section anchor-section my-3">
+                    <div class="row">
+                        <div class="col-12 section-header text-center my-5">
+                            <h2 class="h3 font-weight-bold mb-0">This Week</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 section-content">
+                            <section id="monday" class="events-daily-section">
+                                <div class="section-header text-center">
+                                    <h3 class="h4">Monday</h3>
+                                </div>
+                                <div id="monday-content" class="section-content text-center p-2">
+                                    <p class="h5">No events</p>
+                                </div>
+                                <div class="my-3 section-footer section-links">
+                                </div>
+                            </section>
+                            <section id="tuesday" class="events-daily-section">
+                                <div class="section-header text-center">
+                                    <h3 class="h4">Tuesday</h3>
+                                </div>
+                                <div id="tuesday-content" class="section-content text-center p-2">
+                                    <p class="h5">No events</p>
+                                </div>
+                                <div class="my-3 section-footer section-links">
+                                </div>
+                            </section>
+                            <section id="wednesday" class="events-daily-section">
+                                <div class="section-header text-center">
+                                    <h3 class="h4">Wednesday</h3>
+                                </div>
+                                <div id="wednesday-content" class="section-content text-center p-2">
+                                    <p class="h5">No events</p>
+                                </div>
+                                <div class="my-3 section-footer section-links">
+                                </div>
+                            </section>
+                            <section id="thursday" class="events-daily-section">
+                                <div class="section-header text-center">
+                                    <h3 class="h4">Thursday</h3>
+                                </div>
+                                <div id="thursday-content" class="section-content text-center p-2">
+                                    <p class="h5">No events</p>
+                                </div>
+                                <div class="my-3 section-footer section-links">
+                                </div>
+                            </section>
+                            <section id="friday" class="events-daily-section">
+                                <div class="section-header text-center">
+                                    <h3 class="h4">Friday</h3>
+                                </div>
+                                <div id="friday-content" class="section-content text-center p-2">
+                                    <p class="h5">No events</p>
+                                </div>
+                                <div class="my-3 section-footer section-links">
+                                </div>
+                            </section>
+                            <section id="saturday" class="events-daily-section">
+                                <div class="section-header text-center">
+                                    <h3 class="h4">Saturday</h3>
+                                </div>
+                                <div id="saturday-content" class="section-content text-center p-2">
+                                    <p class="h5">No events</p>
+                                </div>
+                                <div class="my-3 section-footer section-links">
+                                </div>
+                            </section>
+                            <section id="sunday" class="events-daily-section">
+                                <div class="section-header text-center">
+                                    <h3 class="h4">Sunday</h3>
+                                </div>
+                                <div id="sunday-content" class="section-content text-center p-2">
+                                    <p class="h5">No events</p>
+                                </div>
+                                <div class="my-3 section-footer section-links">
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 py-3 section-footer section-links">
+                            <div class="row">
+                                <div class="col-12 text-center btn-wrapper">
+                                    <a href="#events" class="btn btn-cta btn-darkgrey btn-effect">Back to Top</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+
+        <!-- main footer content -->
+        <div class="container-wrapper">
+            <div class="container content-container footer-container">
+                <div class="row align-items-center">
+                    <!-- Google map -->
+                    <div class="col-9 h-100">
+                        <section id="footer-map" class="my-3">
+                            <div class="row">
+                                <div class="col section-header text-center">
+                                    <h6>Just Drop In&#33;</h6>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <!-- inline address -->
+                                <div class="col section-content d-sm-none d-block">
+                                    <p class="my-1">Farren's Bar, Slievebawn, Malin Head, Co. Donegal, F93 FX56, Ireland.</p>
+                                </div>
+                                <!-- block address -->
+                                <div class="col-sm-auto section-content d-none d-sm-flex align-items-center">
+                                    <address>
+                                        <p class="my-1">
+                                            Farren's Bar,<br>
+                                            Slievebawn,<br>
+                                            Malin Head,<br>
+                                            Co. Donegal,<br>
+                                            F93 FX56,<br>
+                                            Ireland.
+                                        </p>
+                                    </address>
+                                </div>
+                                <!-- Force next column to break to new line at sm breakpoint and below -->
+                                <div class="w-100 d-sm-none d-block"></div>
+                                <!-- map embed -->
+                                <div class="col section-content d-flex justify-content-center align-items-center footer-map-embed">
+                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d18138.198191934855!2d-7.350657768214487!3d55.370661041476886!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x488aaca2f5936fd1%3A0x9f0375678136235b!2sFarren&#39;s%20Bar!5e0!3m2!1sen!2sie!4v1747054072503!5m2!1sen!2sie" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <!-- contact info & social media links -->
+                    <div class="col-3">
+                        <section id="footer-links" class="my-3">
+                            <div class="row">
+                                <div class="col section-content">
+                                    <!-- footer links to social media accounts, etc. -->
+                                    <ul class="footer-contact-social-links d-sm-flex justify-content-around">
+                                        <li class="footer-contact-link">
+                                            <button type="button" class="btn link-btn p-0" data-toggle="modal" data-target="#phone-info-modal" aria-label="open modal for phone details and call link">
+                                                <i class="fa-solid fa-phone"></i>
+                                            </button>
+                                        </li>
+                                        <li class="footer-contact-link">
+                                            <button type="button" class="btn link-btn p-0" data-toggle="modal" data-target="#email-info-modal" aria-label="open modal for email address and email form">
+                                                <i class="fa-solid fa-envelope"></i>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    <ul class="footer-contact-social-links d-sm-flex justify-content-around">
+                                        <li class="footer-social-link">
+                                            <a href="https://www.facebook.com/farrenbar1825/" target="_blank" rel="noopener" aria-label="Visit our facebook page, (opens in a new tab)"><i class="fab fa-facebook"></i></a>
+                                        </li>
+                                        <li class="footer-social-link">
+                                            <a href="https://www.instagram.com/farrensbar1825/" target="_blank" rel="noopener" aria-label="Visit our instagram page, (opens in a new tab)"><i class="fab fa-instagram"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+        <!-- copyright statement -->
+        <div id="copyright-statement">
+            &copy; <span class="copyright-year"></span> Farren's Bar: all rights reserved
+        </div>
+        <!-- company plug -->
+        <div id="hwd-plug">
+            Website design &amp; build by <a href="https://www.headwebdesign.ie/" target="_blank" rel="noopener" aria-label="Head Web Design homepage, (opens in a new tab)">Head Web Design</a> &copy; <span class="copyright-year"></span>: all rights reserved
+        </div>
+
+    </footer>
+
+    <!-- Popup modals for phone and email links in footer -->
+
+    <div id="phone-info-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="phone-info-title" aria-describedby="phone-info-description" aria-hidden="true">
+        <div class="modal-dialog footer-contact-link-modal" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h4 id="phone-info-title" class="modal-title p-3">Call Us</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body d-flex justify-content-center align-items-center">
+                    <div class="modal-body-content text-center">
+                        <p id="phone-info-description" class="aria-modal-description sr-only">
+                            Call us on the number below, Monday to Sunday, between 12 noon and 8 p m.
+                        </p>
+                        <p id="modal-phone-no">
+                            <a href="tel:00353749370128" aria-label="call Farren's Bar on 00353749370128">
+                                <i class="fa-solid fa-phone"></i>
+                                <span> &#43;353 74 93 70128</span>
+                            </a>
+                        </p>
+                        <p class="open-hours-info">
+                            <i class="fa-regular fa-clock"></i>
+                            <span> Monday to Sunday, 12 noon to 8p.m.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="email-info-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="email-info-title" aria-describedby="email-info-description" aria-hidden="true">
+        <div class="modal-dialog footer-contact-link-modal" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h4 id="email-info-title" class="modal-title p-3">Contact Us</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body pt-0">
+                    <div class="modal-body-content text-center pb-0">
+                        <p id="email-info-description" class="aria-modal-description sr-only">
+                            Fill out the form below, or use the link to send a direct email to: info at farrensbar dot ie
+                        </p>
+                        <p id="email-modal-description" class="text-left ml-3">
+                            Fill out the form below, or send a direct email to: 
+                            <a href="mailto:info@farrensbar.ie" aria-label="email Farren's Bar">info&#64;farrensbar.ie</a>
+                        </p>
+                        <p aria-hidden="true">Fields marked with &#42; are required.</p>
+                        <div id="modal-email-form">
+                            <form id="modal-contact-form" class="contact-form">
+                                <div class="form-row">
+                                    <div class="form-group col-sm-6">
+                                        <label for="modal-cf-first-name" class="sr-only">First Name (required)</label>
+                                        <input type="text" id="modal-cf-first-name" name="firstname" class="form-control" placeholder="First Name&#42;" required>
+                                    </div>
+                                    <div class="form-group col-sm-6">
+                                        <label for="modal-cf-last-name" class="sr-only">Surname (required)</label>
+                                        <input type="text" id="modal-cf-last-name" name="surname" class="form-control" placeholder="Surname&#42;" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="modal-cf-email-address" class="sr-only">Email Address (required)</label>
+                                    <input type="email" id="modal-cf-email-address" name="email" class="form-control" placeholder="Email Address&#42;" aria-describedby="modal-cf-email-help-text" required>
+                                    <small id="modal-cf-email-help-text" class="form-text">We'll never share your email with anyone else.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="modal-cf-phone-no" class="sr-only">Phone Number (optional)</label>
+                                    <input type="text" id="modal-cf-phone-no" name="phone" class="form-control" placeholder="Phone Number" aria-describedby="modal-cf-phone-help-text">
+                                    <small id="modal-cf-phone-help-text" class="form-text">We'll never share your phone number with anyone else.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="modal-cf-message">Your Message (required)</label>
+                                    <textarea rows="5" id="modal-cf-message" name="message" class="form-control" placeholder="Enter Your Message&#42;" required></textarea>
+                                </div>
+                                <div class="cf-success-message cf-hidden text-center" aria-hidden="true">
+                                    <p>Your message was sent successfully&#33;</p>
+                                    <p>
+                                        Thank you for reaching out. <br>
+                                        We'll be in touch as soon as possible.
+                                    </p>
+                                </div>
+                                <div class="cf-failure-message cf-hidden text-center" aria-hidden="true">
+                                    <p>
+                                        Unfortunately, your message was not sent <br>
+                                        due to a system error.
+                                    </p>
+                                    <p>
+                                        Instead, please send a direct email to <br>
+                                        <a href="info@farrensbar.ie" aria-label="email Farren's Bar">info&#64;farrensbar.ie</a> <br>
+                                        or refresh the page to try again.
+                                    </p>
+                                </div>
+                                <div class="col text-center p-0 contact-btn-wrapper">
+                                    <div class="g-recaptcha" data-sitekey="6Lfo2mErAAAAAMeaGh7JUjlJuMTFYmvpd24FyKcV"></div>
+                                    <br>
+                                    <button type="submit" class="btn btn-cta btn-darkgrey btn-effect">Get in Touch</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+    <!-- Bootstrap scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <!-- Font Awesome script -->
+    <script src="https://kit.fontawesome.com/e5bba26aba.js" crossorigin="anonymous"></script>
+
+    <!-- Custom scripts -->
+    <script src="assets/js/script.js"></script>
+</body>
+</html>

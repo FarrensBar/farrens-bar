@@ -18,6 +18,7 @@
 
 body {
     font-family: 'Nunito Sans', sans-serif;
+    background-color: #000;
     color: #fff;
 }
 
@@ -552,9 +553,12 @@ footer hr {
     margin: 0 auto !important;
 }
 
+#cta-carousel-container {
+    width: 300px !important;
+}
+
 .carousel-container {
     position: relative;
-    width: 300px !important;
     padding-bottom: 20px;
     margin: 0 auto;
 }
@@ -588,7 +592,6 @@ footer hr {
     position: relative;
     height: 180px;
     margin: 0;
-    scroll-snap-type: x mandatory;
 }
 
 .carousel-trans-left {
@@ -599,7 +602,6 @@ footer hr {
     flex-shrink: 0;
     height: 100%;
     width: 100%;
-    scroll-snap-align: center;
 }
 
 .carousel-img {
@@ -630,10 +632,11 @@ footer hr {
     background: transparent;
 }
 
-#carousel-keynav-instructions {
+.carousel-keynav-instructions {
     position: absolute;
     top: 0;
     bottom: 0;
+    width: 100%;
     background-color: #000;
     border: 1px solid #fff;
     border-radius: 5px;
@@ -664,6 +667,133 @@ footer hr {
     height: auto;
     width: 100%;
 }
+
+
+
+            /************************************/
+            /*                                  */
+            /* --------- Events page ---------- */
+            /*                                  */
+            /************************************/
+
+/* general styles */
+
+/* tv carousel */
+
+#tv-carousel-container.carousel-container {
+    max-width: 1024px !important;
+    margin: auto !important;
+}
+
+.tv-frame {
+	background: #000;
+	position: relative;
+	border-top: 3px solid #888;
+	margin: 5%;
+	padding: 2% 2% 4% 2%;
+	border-radius: 10px;
+	border-bottom-left-radius: 50% 2%;
+	border-bottom-right-radius: 50% 2%;
+	transition: margin-right 1s;
+    /* box-shadow: 0 0 100px 0 rgba(225,235,255,0.4); */
+    box-shadow: 0 0 100px 0 rgba(255,255,255,0.6);
+}
+
+.tv-frame:after {
+	content: '';
+	display: block;
+	position: absolute;
+	bottom: 3%;
+	left: 36%;
+	height: .5%;
+	width: 28%;
+	background: #ddd;
+	border-radius: 50%;
+	box-shadow: 0 0 3px 0 #fff;
+}
+
+.tv-screen {
+	position: relative;
+    background-color: #222;
+	background-size: cover;
+	background-position: top center;
+	height: 0;
+	padding-bottom: 56.25%;
+}
+
+#tv-carousel-track.carousel-track {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100% !important;
+}
+
+#tv-carousel-keynav-instructions.carousel-keynav-instructions {
+    padding: 10% 5%;
+    font-size: 2.5rem;
+}
+
+.carousel-trans-fade {
+    opacity: 0;
+    -webkit-animation: fadeoutin 2s forwards ease-in-out;
+    -moz-animation: fadeoutin 2s forwards ease-in-out;
+    -o-animation: fadeoutin 2s forwards ease-in-out;
+    animation: fadeoutin 2s forwards ease-in-out;
+}
+
+@-webkit-keyframes fadeoutin {
+  0% {opacity: 1;}
+  50% {opacity: 0;}
+  100% {opacity: 1;}
+}
+@-moz-keyframes fadeoutin {
+  0% {opacity: 1;}
+  50% {opacity: 0;}
+  100% {opacity: 1;}
+}
+@-o-keyframes fadeoutin {
+  0% {opacity: 1;}
+  50% {opacity: 0;}
+  100% {opacity: 1;}
+}
+@keyframes fadeoutin {
+  0% {opacity: 1;}
+  50% {opacity: 0;}
+  100% {opacity: 1;}
+}
+
+.tv-flicker {
+    -webkit-animation: tvflicker 2s forwards ease-in-out;
+    -moz-animation: tvflicker 2s forwards ease-in-out;
+    -o-animation: tvflicker 2s forwards ease-in-out;
+    animation: tvflicker 2s forwards ease-in-out;
+}
+
+@-webkit-keyframes tvflicker {
+  0% {box-shadow: 0 0 100px 0 rgba(255,255,255,0.6);}
+  50% {box-shadow: 0 0 60px 0 rgba(200,220,255,0.4);}
+  100% {box-shadow: 0 0 100px 0 rgba(255,255,255,0.6);}
+}
+@-moz-keyframes tvflicker {
+  0% {box-shadow: 0 0 100px 0 rgba(255,255,255,0.6);}
+  50% {box-shadow: 0 0 60px 0 rgba(200,220,255,0.4);}
+  100% {box-shadow: 0 0 100px 0 rgba(255,255,255,0.6);}
+}
+@-o-keyframes tvflicker {
+  0% {box-shadow: 0 0 100px 0 rgba(255,255,255,0.6);}
+  50% {box-shadow: 0 0 60px 0 rgba(200,220,255,0.4);}
+  100% {box-shadow: 0 0 100px 0 rgba(255,255,255,0.6);}
+}
+@keyframes tvflicker {
+  0% {box-shadow: 0 0 100px 0 rgba(255,255,255,0.6);}
+  50% {box-shadow: 0 0 60px 0 rgba(200,220,255,0.4);}
+  100% {box-shadow: 0 0 100px 0 rgba(255,255,255,0.6);}
+}
+
+/* events section */
+
+
 
 
 
@@ -759,6 +889,12 @@ margin: 0;
 
 @media screen and (max-width: 992px) {
 
+    /* events page */
+
+    #tv-carousel-keynav-instructions.carousel-keynav-instructions {
+        font-size: 2rem;
+    }
+
     /* contact page */
 
     #contact-page-form {
@@ -847,6 +983,12 @@ margin: 0;
     #landing-banner.banner-container {
         height: calc(100vh - 140px);
     }
+
+    /* events page */
+
+    #tv-carousel-keynav-instructions.carousel-keynav-instructions {
+        font-size: 1.5rem;
+    }
 }
 
 /* for smaller-sized screens, up to 576 pixels wide (matches Bootstrap's xs - sm breakpoint) */
@@ -857,6 +999,12 @@ margin: 0;
 
     .main-menu-responsive {
         width: 100vw;
+    }
+
+    /* events page */
+
+    #tv-carousel-keynav-instructions.carousel-keynav-instructions {
+        font-size: 1rem;
     }
 }
 
